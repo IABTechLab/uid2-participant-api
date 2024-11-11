@@ -5,6 +5,7 @@ ENV SA_PASSWORD=D3velopmentP0
 
 COPY ./entrypoint.sh /entrypoint.sh
 COPY ./setup.sql /setup.sql
+COPY ./schema/ /schema/
 
 ENTRYPOINT [ "/bin/bash", "entrypoint.sh" ]
 CMD [ "/opt/mssql/bin/sqlservr" ]

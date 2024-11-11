@@ -3,6 +3,19 @@ set -e
 
 echo "Starting entrypoint: $1, $2"
 
+function update_database_schema() {
+    while [ ! -f /tmp/app-initialized ]; 
+    do
+        sleep 1s
+    done
+
+    for FILE in /schema/*.sql
+    do 
+        echo "Executing file: $FILE"
+        /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P $SA_PASSWORD -C -i $FILE
+    done
+}
+
 if [ "$1" = '/opt/mssql/bin/sqlservr' ]; then
   # If this is the container's first run, initialize the application database
   if [ ! -f /tmp/app-initialized ]; then
@@ -17,8 +30,11 @@ if [ "$1" = '/opt/mssql/bin/sqlservr' ]; then
       # Note that the container has been initialized so future starts won't wipe changes to the data
       touch /tmp/app-initialized
     }
+
     initialize_app_database &
   fi
+
+  update_database_schema &
 fi
 
 exec "$@"
