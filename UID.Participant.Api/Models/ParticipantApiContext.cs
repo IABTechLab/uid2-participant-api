@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace uid2_participant_api;
+namespace UID.Participant.Api;
 
 public partial class ParticipantApiContext : DbContext
 {

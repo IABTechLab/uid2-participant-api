@@ -1,4 +1,4 @@
-﻿namespace uid2_participant_api
+﻿namespace UID.Participant.Api
 {
     public static class Constants
     {

@@ -27,7 +27,7 @@
   </ItemGroup>
 
   <ItemGroup>
-    <ProjectReference Include="..\uid2-participant-api\uid2-participant-api.csproj" />
+    <ProjectReference Include="..\UID.Participant.Api\UID.Participant.Api.csproj" />
   </ItemGroup>
 
   <ItemGroup>

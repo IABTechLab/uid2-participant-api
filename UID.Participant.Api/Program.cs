@@ -3,8 +3,8 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Options;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
-using uid2_participant_api;
-using uid2_participant_api.Swagger;
+using UID.Participant.Api;
+using UID.Participant.Api.Swagger;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()

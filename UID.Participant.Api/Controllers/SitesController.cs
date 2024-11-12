@@ -4,7 +4,7 @@ using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
-namespace uid2_participant_api.Controllers
+namespace UID.Participant.Api.Controllers
 {
     [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]

@@ -3,8 +3,8 @@ using EntityFrameworkCore.Testing.NSubstitute;
 using FluentAssertions;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
-using uid2_participant_api;
-using uid2_participant_api.Controllers;
+using UID.Participant.Api;
+using UID.Participant.Api.Controllers;
 
 namespace UID2.Participant.Api.Test
 {
