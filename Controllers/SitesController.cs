@@ -7,20 +7,27 @@ namespace uid2_participant_api.Controllers
 {
     [Route("api/[controller]")]
     [ApiController]
+    [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public class SitesController : ControllerBase
     {
+        private readonly ILogger<SitesController> logger;
         private readonly ParticipantApiContext participantApiContext;
 
-        public SitesController(ParticipantApiContext participantApiContext)
+        public SitesController(ILogger<SitesController> logger, ParticipantApiContext participantApiContext)
         {
+            this.logger = logger;
             this.participantApiContext = participantApiContext;
         }
 
         // GET: api/<SitesController>
         [HttpGet]
-        public IEnumerable<Site> Get()
+        [ProducesResponseType<IEnumerable<Site>>(StatusCodes.Status200OK)]
+        public async ValueTask<IActionResult>  Get()
         {
-            return new Site[] { new Site(), new Site() };
+            var sites = await this.participantApiContext.Sites
+                .AsNoTracking()
+                .ToListAsync();
+            return Ok(sites);
         }
 
         // GET api/<SitesController>/5
@@ -29,26 +36,56 @@ namespace uid2_participant_api.Controllers
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async ValueTask<IActionResult> Get(int id)
         {
-            var site = await this.participantApiContext.Sites.FirstOrDefaultAsync(s => s.Id == id);
+            var site = await this.participantApiContext.Sites
+                .AsNoTracking()
+                .FirstOrDefaultAsync(s => s.Id == id);
             return site == null ? NotFound() : Ok(site);
         }
 
         // POST api/<SitesController>
         [HttpPost]
-        public void Post([FromBody] string value)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        public async ValueTask<IActionResult> Post([FromBody] Site value)
         {
+            try
+            {
+                await this.participantApiContext.AddAsync(value);
+                return Ok();
+            }
+            catch (Exception ex)
+            {
+                this.logger.LogDebug(ex, "Error adding Site.");
+                return BadRequest();
+            }
         }
 
         // PUT api/<SitesController>/5
         [HttpPut("{id}")]
-        public void Put(int id, [FromBody] string value)
+        [ProducesResponseType(StatusCodes.Status200OK)]
+        [ProducesResponseType(StatusCodes.Status400BadRequest)]
+        [ProducesResponseType(StatusCodes.Status404NotFound)]
+        public async ValueTask<IActionResult> Put(int id, [FromBody] Site value)
         {
+            var site = await this.participantApiContext.Sites.FirstOrDefaultAsync(s => s.Id == id);
+            if (site != null)
+            {
+                site.Name = value.Name;
+                site.Enabled = value.Enabled;
+                site.Visible = value.Visible;
+                await this.participantApiContext.SaveChangesAsync();
+                return Ok();
+            }
+            else
+            {
+                return NotFound();
+            }
         }
 
         // DELETE api/<SitesController>/5
-        [HttpDelete("{id}")]
+        /*[HttpDelete("{id}")]
         public void Delete(int id)
         {
-        }
+        }*/
     }
 }
