@@ -1,28 +1,55 @@
 using Microsoft.EntityFrameworkCore;
+using Serilog;
 using uid2_participant_api;
 
-var builder = WebApplication.CreateBuilder(args);
+Log.Logger = new LoggerConfiguration()
+    .WriteTo.Console()
+    .CreateBootstrapLogger();
 
-// Add services to the container.
+Log.Information("Starting UID2 Participant API");
 
+try
+{
+    var builder = WebApplication.CreateBuilder(args);
 
-builder.Services.AddControllers();
-builder.Services.AddDbContext<ParticipantApiContext>(options => options.UseSqlServer($"name=ConnectionStrings:{Constants.DBConnectionStringName}"));
-// Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
-builder.Services.AddEndpointsApiExplorer();
-builder.Services.AddSwaggerGen();
+    // Add services to the container.
+    builder.Services.AddSerilog((services, lc) => lc
+        .ReadFrom.Configuration(builder.Configuration)
+        .ReadFrom.Services(services)
+        .Enrich.FromLogContext());
 
-var app = builder.Build();
+    builder.Services.AddControllers();
+    builder.Services.AddDbContext<ParticipantApiContext>(options => options.UseSqlServer($"name=ConnectionStrings:{Constants.DBConnectionStringName}"));
+    // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
+    builder.Services.AddEndpointsApiExplorer();
+    builder.Services.AddSwaggerGen();
 
-// Configure the HTTP request pipeline.
-//if (app.Environment.IsDevelopment())
-//{
+    await using var app = builder.Build();
+
+    app.UseSerilogRequestLogging();
+
+    // Configure the HTTP request pipeline.
+    //if (app.Environment.IsDevelopment())
+    //{
     app.UseSwagger();
     app.UseSwaggerUI();
-//}
+    //}
 
-app.UseAuthorization();
+    app.UseAuthorization();
 
-app.MapControllers();
+    app.MapControllers();
 
-app.Run();
+    await app.RunAsync();
+
+    Log.Information("Stopped cleanly");
+    return 0;
+}
+catch (Exception ex)
+{
+    Log.Fatal(ex, "Unexpected error starting UID2 Participant API");
+    return 1;
+}
+finally
+{
+    Log.CloseAndFlush();
+}
