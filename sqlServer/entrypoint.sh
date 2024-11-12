@@ -14,6 +14,12 @@ function update_database_schema() {
         echo "Executing file: $FILE"
         /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P $SA_PASSWORD -C -i $FILE
     done
+
+    for FILE in /seedData/*.sql
+    do 
+        echo "Executing file: $FILE"
+        /opt/mssql-tools18/bin/sqlcmd -S localhost -U sa -P $SA_PASSWORD -C -i $FILE
+    done
 }
 
 if [ "$1" = '/opt/mssql/bin/sqlservr' ]; then
