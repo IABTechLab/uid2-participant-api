@@ -1,12 +1,14 @@
-﻿using Microsoft.AspNetCore.Mvc;
+﻿using Asp.Versioning;
+using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
 
 namespace uid2_participant_api.Controllers
 {
-    [Route("api/[controller]")]
+    [Route("api/v{version:apiVersion}/[controller]")]
     [ApiController]
+    [ApiVersion(1.0)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
     public class SitesController : ControllerBase
     {
@@ -19,10 +21,10 @@ namespace uid2_participant_api.Controllers
             this.participantApiContext = participantApiContext;
         }
 
-        // GET: api/<SitesController>
+        // GET: api/Sites
         [HttpGet]
         [ProducesResponseType<IEnumerable<Site>>(StatusCodes.Status200OK)]
-        public async ValueTask<IActionResult>  Get()
+        public async ValueTask<IActionResult> Get()
         {
             var sites = await this.participantApiContext.Sites
                 .AsNoTracking()
@@ -30,7 +32,7 @@ namespace uid2_participant_api.Controllers
             return Ok(sites);
         }
 
-        // GET api/<SitesController>/5
+        // GET api/Sites/5
         [HttpGet("{id}")]
         [ProducesResponseType<Site>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
@@ -42,7 +44,7 @@ namespace uid2_participant_api.Controllers
             return site == null ? NotFound() : Ok(site);
         }
 
-        // POST api/<SitesController>
+        // POST api/Sites
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -60,7 +62,7 @@ namespace uid2_participant_api.Controllers
             }
         }
 
-        // PUT api/<SitesController>/5
+        // PUT api/Sites/5
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
@@ -82,7 +84,7 @@ namespace uid2_participant_api.Controllers
             }
         }
 
-        // DELETE api/<SitesController>/5
+        // DELETE api/Sites/5
         /*[HttpDelete("{id}")]
         public void Delete(int id)
         {

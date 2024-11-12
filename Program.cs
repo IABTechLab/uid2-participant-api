@@ -1,6 +1,10 @@
+using Asp.Versioning;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Options;
 using Serilog;
+using Swashbuckle.AspNetCore.SwaggerGen;
 using uid2_participant_api;
+using uid2_participant_api.Swagger;
 
 Log.Logger = new LoggerConfiguration()
     .WriteTo.Console()
@@ -18,11 +22,27 @@ try
         .ReadFrom.Services(services)
         .Enrich.FromLogContext());
 
+    builder.Services.AddApiVersioning(options =>
+    {
+        options.DefaultApiVersion = new ApiVersion(1.0);
+        options.ReportApiVersions = true;
+        options.AssumeDefaultVersionWhenUnspecified = true;
+        options.ApiVersionReader = ApiVersionReader.Combine(
+        new UrlSegmentApiVersionReader(),
+        new HeaderApiVersionReader("X-Api-Version"));
+    })
+    .AddApiExplorer(options =>
+    {
+        options.SubstituteApiVersionInUrl = true;
+        options.GroupNameFormat = "'v'V";
+    });
+
     builder.Services.AddControllers();
     builder.Services.AddDbContext<ParticipantApiContext>(options => options.UseSqlServer($"name=ConnectionStrings:{Constants.DBConnectionStringName}"));
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
-    builder.Services.AddSwaggerGen();
+    builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();
+    builder.Services.AddSwaggerGen(options => options.OperationFilter<SwaggerDefaultValues>());
 
     await using var app = builder.Build();
 
@@ -32,7 +52,14 @@ try
     //if (app.Environment.IsDevelopment())
     //{
     app.UseSwagger();
-    app.UseSwaggerUI();
+    app.UseSwaggerUI(options => {
+        var descriptions = app.DescribeApiVersions();
+        foreach (var description in descriptions)
+        {
+            var url = $"/swagger/{description.GroupName}/swagger.json";
+            options.SwaggerEndpoint(url, description.GroupName);
+        }
+    });
     //}
 
     app.UseAuthorization();
