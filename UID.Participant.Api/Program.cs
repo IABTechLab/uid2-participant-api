@@ -38,8 +38,11 @@ try
         options.GroupNameFormat = "'v'V";
     });
 
+    var connectionString = builder.Configuration.GetConnectionString(Constants.DBConnectionStringName);
+    Log.Information("Connection String: {conn_string}", connectionString);
+
     builder.Services.AddControllers();
-    builder.Services.AddDbContext<ParticipantApiContext>(options => options.UseSqlServer($"name=ConnectionStrings:{Constants.DBConnectionStringName}"));
+    builder.Services.AddDbContext<ParticipantApiContext>(options => options.UseSqlServer(connectionString));
     // Learn more about configuring Swagger/OpenAPI at https://aka.ms/aspnetcore/swashbuckle
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddTransient<IConfigureOptions<SwaggerGenOptions>, ConfigureSwaggerOptions>();

@@ -1,10 +1,10 @@
-# docker commands
+# docker compose commands
 
-Build the image:
-`docker build -t uid2-participant-api-image .`
+Build the images:
+`docker compose -f .\docker-compose.yml -f .\docker-compose.override.yml build`
 
-Run the container:
-`docker run -d -p 6001:8080 --name uid2-participant-api-image-container uid2-participant-api-image`
+Run the docker stack:
+`docker compose -f .\docker-compose.yml -f .\docker-compose.override.yml up`
 
 Go here to test:
-http://localhost:6001/swagger/index.html
+http://localhost:5050/swagger/index.html

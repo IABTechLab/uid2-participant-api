@@ -1,7 +1,9 @@
-﻿volumes:
-  mssqldata:
-
 services:
+  uid.participant.api:
+    image: ${DOCKER_REGISTRY-}uidparticipantapi
+    build:
+      context: .
+      dockerfile: UID.Participant.Api/Dockerfile
   database:
     container_name: uid2_selfserve_mssql
     # image: mcr.microsoft.com/mssql/server:2022-latest
@@ -20,3 +22,6 @@ services:
       interval: 10s
       timeout: 10s
       retries: 5
+
+volumes:
+  mssqldata:
