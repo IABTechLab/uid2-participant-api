@@ -4,6 +4,7 @@ using Microsoft.Extensions.Options;
 using Serilog;
 using Swashbuckle.AspNetCore.SwaggerGen;
 using UID.Participant.Api;
+using UID.Participant.Api.Models;
 using UID.Participant.Api.Swagger;
 
 Log.Logger = new LoggerConfiguration()

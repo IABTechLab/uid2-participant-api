@@ -1,7 +1,7 @@
 ﻿using System;
 using System.Collections.Generic;
 
-namespace UID.Participant.Api;
+namespace UID.Participant.Api.Models;
 
 public partial class Site
 {

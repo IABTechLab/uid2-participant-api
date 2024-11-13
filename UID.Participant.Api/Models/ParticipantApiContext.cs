@@ -2,7 +2,7 @@
 using System.Collections.Generic;
 using Microsoft.EntityFrameworkCore;
 
-namespace UID.Participant.Api;
+namespace UID.Participant.Api.Models;
 
 public partial class ParticipantApiContext : DbContext
 {
@@ -19,16 +19,12 @@ public partial class ParticipantApiContext : DbContext
 
     public virtual DbSet<Site> Sites { get; set; }
 
-    //protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
-    //    => optionsBuilder.UseSqlServer(Configuration.GetConnectionString);
-
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
         modelBuilder.Entity<ClientType>(entity =>
         {
             entity.ToTable("ClientTypes", "ParticipantApi");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
             entity.Property(e => e.Name)
                 .HasMaxLength(100)
                 .IsUnicode(false);
@@ -38,13 +34,9 @@ public partial class ParticipantApiContext : DbContext
         {
             entity.ToTable("Sites", "ParticipantApi");
 
-            entity.Property(e => e.Id).ValueGeneratedNever();
-            entity.Property(e => e.Description).IsUnicode(false);
-            entity.Property(e => e.Name)
-                .HasMaxLength(200)
-                .IsUnicode(false);
+            entity.Property(e => e.Name).HasMaxLength(200);
 
-            entity.HasMany(d => d.ClientTypes).WithMany(p => p.Sites)
+            entity.HasMany(d => d.ClientTypes).WithMany()
                 .UsingEntity<Dictionary<string, object>>(
                     "SiteClientType",
                     r => r.HasOne<ClientType>().WithMany()

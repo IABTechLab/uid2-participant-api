@@ -11,9 +11,9 @@ CREATE SCHEMA [ParticipantApi];
 GO
 
 CREATE TABLE [ParticipantApi].[Sites](
-	[Id] [int] NOT NULL,
-	[Name] [varchar](200) NULL,
-	[Description] [varchar](max) NULL,
+	[Id] [int] IDENTITY(1,1) NOT NULL,
+	[Name] [nvarchar](200) NULL,
+	[Description] [nvarchar](max) NULL,
 	[Enabled] [bit] NOT NULL,
 	[Visible] [bit] NOT NULL,
  CONSTRAINT [PK_Sites] PRIMARY KEY CLUSTERED 
@@ -24,7 +24,7 @@ CREATE TABLE [ParticipantApi].[Sites](
 GO
 
 CREATE TABLE [ParticipantApi].[ClientTypes](
-	[Id] [int] NOT NULL,
+	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[Name] [varchar](100) NOT NULL,
  CONSTRAINT [PK_ClientTypes] PRIMARY KEY CLUSTERED 
 (

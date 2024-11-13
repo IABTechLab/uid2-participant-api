@@ -6,7 +6,7 @@ services:
     container_name: uid2_selfserve_mssql
     # image: mcr.microsoft.com/mssql/server:2022-latest
     build:
-      context: ./sqlServer
+      context: ./UID.Participant.Api/sqlServer
       dockerfile: SqlServerDockerfile
     ports:
       - '11433:1433'
