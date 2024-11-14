@@ -1,5 +1,5 @@
 
-drop table ParticipantApi.SiteClientType
-drop table ParticipantApi.Sites
+drop table ParticipantApi.ParticipantClientType
+drop table ParticipantApi.Participants
 drop table ParticipantApi.ClientTypes
 drop schema ParticipantApi

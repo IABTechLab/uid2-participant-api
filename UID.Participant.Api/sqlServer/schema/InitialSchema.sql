@@ -10,13 +10,13 @@ GO
 CREATE SCHEMA [ParticipantApi];
 GO
 
-CREATE TABLE [ParticipantApi].[Sites](
+CREATE TABLE [ParticipantApi].[Participants](
 	[Id] [int] IDENTITY(1,1) NOT NULL,
 	[Name] [nvarchar](200) NULL,
 	[Description] [nvarchar](max) NULL,
 	[Enabled] [bit] NOT NULL,
 	[Visible] [bit] NOT NULL,
- CONSTRAINT [PK_Sites] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_Participants] PRIMARY KEY CLUSTERED 
 (
 	[Id] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
@@ -35,28 +35,28 @@ GO
 
 
 
-CREATE TABLE [ParticipantApi].[SiteClientType](
-	[SiteId] [int] NOT NULL,
+CREATE TABLE [ParticipantApi].[ParticipantClientType](
+	[ParticipantId] [int] NOT NULL,
 	[ClientTypeId] [int] NOT NULL,
- CONSTRAINT [PK_SiteClientType] PRIMARY KEY CLUSTERED 
+ CONSTRAINT [PK_ParticipantClientType] PRIMARY KEY CLUSTERED 
 (
-	[SiteId] ASC,
+	[ParticipantId] ASC,
 	[ClientTypeId] ASC
 )WITH (PAD_INDEX = OFF, STATISTICS_NORECOMPUTE = OFF, IGNORE_DUP_KEY = OFF, ALLOW_ROW_LOCKS = ON, ALLOW_PAGE_LOCKS = ON, OPTIMIZE_FOR_SEQUENTIAL_KEY = OFF) ON [PRIMARY]
 ) ON [PRIMARY]
 GO
 
-ALTER TABLE [ParticipantApi].[SiteClientType]  WITH CHECK ADD  CONSTRAINT [FK_SiteClientType_ClientTypes] FOREIGN KEY([ClientTypeId])
+ALTER TABLE [ParticipantApi].[ParticipantClientType]  WITH CHECK ADD  CONSTRAINT [FK_ParticipantClientType_ClientTypes] FOREIGN KEY([ClientTypeId])
 REFERENCES [ParticipantApi].[ClientTypes] ([Id])
 GO
 
-ALTER TABLE [ParticipantApi].[SiteClientType] CHECK CONSTRAINT [FK_SiteClientType_ClientTypes]
+ALTER TABLE [ParticipantApi].[ParticipantClientType] CHECK CONSTRAINT [FK_ParticipantClientType_ClientTypes]
 GO
 
-ALTER TABLE [ParticipantApi].[SiteClientType]  WITH CHECK ADD  CONSTRAINT [FK_SiteClientType_Sites] FOREIGN KEY([SiteId])
-REFERENCES [ParticipantApi].[Sites] ([Id])
+ALTER TABLE [ParticipantApi].[ParticipantClientType]  WITH CHECK ADD  CONSTRAINT [FK_ParticipantClientType_Participants] FOREIGN KEY([ParticipantId])
+REFERENCES [ParticipantApi].[Participants] ([Id])
 GO
 
-ALTER TABLE [ParticipantApi].[SiteClientType] CHECK CONSTRAINT [FK_SiteClientType_Sites]
+ALTER TABLE [ParticipantApi].[ParticipantClientType] CHECK CONSTRAINT [FK_ParticipantClientType_Participants]
 GO
 

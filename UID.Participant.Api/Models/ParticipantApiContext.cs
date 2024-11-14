@@ -17,7 +17,7 @@ public partial class ParticipantApiContext : DbContext
 
     public virtual DbSet<ClientType> ClientTypes { get; set; }
 
-    public virtual DbSet<Site> Sites { get; set; }
+    public virtual DbSet<Participant> Participants { get; set; }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {
@@ -30,28 +30,30 @@ public partial class ParticipantApiContext : DbContext
                 .IsUnicode(false);
         });
 
-        modelBuilder.Entity<Site>(entity =>
+        modelBuilder.Entity<Participant>(entity =>
         {
-            entity.ToTable("Sites", "ParticipantApi");
+            entity.ToTable("Participants", "ParticipantApi");
 
             entity.Property(e => e.Name).HasMaxLength(200);
 
             entity.HasMany(d => d.ClientTypes).WithMany()
                 .UsingEntity<Dictionary<string, object>>(
-                    "SiteClientType",
+                    "ParticipantClientType",
                     r => r.HasOne<ClientType>().WithMany()
                         .HasForeignKey("ClientTypeId")
                         .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK_SiteClientType_ClientTypes"),
-                    l => l.HasOne<Site>().WithMany()
-                        .HasForeignKey("SiteId")
+                        .HasConstraintName("FK_ParticipantClientType_ClientTypes"),
+                    l => l.HasOne<Participant>().WithMany()
+                        .HasForeignKey("ParticipantId")
                         .OnDelete(DeleteBehavior.ClientSetNull)
-                        .HasConstraintName("FK_SiteClientType_Sites"),
+                        .HasConstraintName("FK_ParticipantClientType_Participants"),
                     j =>
                     {
-                        j.HasKey("SiteId", "ClientTypeId");
-                        j.ToTable("SiteClientType", "ParticipantApi");
+                        j.HasKey("ParticipantId", "ClientTypeId");
+                        j.ToTable("ParticipantClientType", "ParticipantApi");
                     });
+
+            entity.Navigation(e => e.ClientTypes).AutoInclude();
         });
 
         OnModelCreatingPartial(modelBuilder);

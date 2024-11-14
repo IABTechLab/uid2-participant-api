@@ -3,7 +3,7 @@ using System.Collections.Generic;
 
 namespace UID.Participant.Api.Models;
 
-public partial class Site
+public partial class Participant
 {
     public int Id { get; set; }
 

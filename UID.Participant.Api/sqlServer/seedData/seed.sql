@@ -10,14 +10,14 @@ GO
 SET IDENTITY_INSERT [ParticipantApi].[ClientTypes] OFF;
 
 
-SET IDENTITY_INSERT [ParticipantApi].[Sites] ON;
+SET IDENTITY_INSERT [ParticipantApi].[Participants] ON;
 GO
-INSERT INTO [ParticipantApi].[Sites] ([Id], [Name], [Description], [Enabled], [Visible]) VALUES (1, N'TestSite', N'Test Site Description', 1, 1)
-SET IDENTITY_INSERT [ParticipantApi].[Sites] OFF;
+INSERT INTO [ParticipantApi].[Participants] ([Id], [Name], [Description], [Enabled], [Visible]) VALUES (1, N'TestParticipant', N'Test Participant Description', 1, 1)
+SET IDENTITY_INSERT [ParticipantApi].[Participants] OFF;
 
 
-INSERT INTO [ParticipantApi].[SiteClientType] (SiteId, ClientTypeId) VALUES (1, 1)
-INSERT INTO [ParticipantApi].[SiteClientType] (SiteId, ClientTypeId) VALUES (1, 2)
-INSERT INTO [ParticipantApi].[SiteClientType] (SiteId, ClientTypeId) VALUES (1, 3)
+INSERT INTO [ParticipantApi].[ParticipantClientType] (ParticipantId, ClientTypeId) VALUES (1, 1)
+INSERT INTO [ParticipantApi].[ParticipantClientType] (ParticipantId, ClientTypeId) VALUES (1, 2)
+INSERT INTO [ParticipantApi].[ParticipantClientType] (ParticipantId, ClientTypeId) VALUES (1, 3)
 
 GO

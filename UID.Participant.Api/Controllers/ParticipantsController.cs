@@ -11,45 +11,45 @@ namespace UID.Participant.Api.Controllers
     [ApiController]
     [ApiVersion(1.0)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public class SitesController : ControllerBase
+    public class ParticipantsController : ControllerBase
     {
-        private readonly ILogger<SitesController> logger;
+        private readonly ILogger<ParticipantsController> logger;
         private readonly ParticipantApiContext participantApiContext;
 
-        public SitesController(ILogger<SitesController> logger, ParticipantApiContext participantApiContext)
+        public ParticipantsController(ILogger<ParticipantsController> logger, ParticipantApiContext participantApiContext)
         {
             this.logger = logger;
             this.participantApiContext = participantApiContext;
         }
 
-        // GET: api/Sites
+        // GET: api/Participants
         [HttpGet]
-        [ProducesResponseType<IEnumerable<Site>>(StatusCodes.Status200OK)]
+        [ProducesResponseType<IEnumerable<Models.Participant>>(StatusCodes.Status200OK)]
         public async ValueTask<IActionResult> Get()
         {
-            var sites = await this.participantApiContext.Sites
+            var participants = await this.participantApiContext.Participants
                 .AsNoTracking()
                 .ToListAsync();
-            return Ok(sites);
+            return Ok(participants);
         }
 
-        // GET api/Sites/5
+        // GET api/Participants/5
         [HttpGet("{id}")]
-        [ProducesResponseType<Site>(StatusCodes.Status200OK)]
+        [ProducesResponseType<Models.Participant>(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
         public async ValueTask<IActionResult> Get(int id)
         {
-            var site = await this.participantApiContext.Sites
+            var participant = await this.participantApiContext.Participants
                 .AsNoTracking()
                 .FirstOrDefaultAsync(s => s.Id == id);
-            return site == null ? NotFound() : Ok(site);
+            return participant == null ? NotFound() : Ok(participant);
         }
 
-        // POST api/Sites
+        // POST api/Participants
         [HttpPost]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
-        public async ValueTask<IActionResult> Post([FromBody] Site value)
+        public async ValueTask<IActionResult> Post([FromBody] Models.Participant value)
         {
             try
             {
@@ -58,24 +58,24 @@ namespace UID.Participant.Api.Controllers
             }
             catch (Exception ex)
             {
-                this.logger.LogDebug(ex, "Error adding Site.");
+                this.logger.LogDebug(ex, "Error adding Participant.");
                 return BadRequest();
             }
         }
 
-        // PUT api/Sites/5
+        // PUT api/Participants/5
         [HttpPut("{id}")]
         [ProducesResponseType(StatusCodes.Status200OK)]
         [ProducesResponseType(StatusCodes.Status400BadRequest)]
         [ProducesResponseType(StatusCodes.Status404NotFound)]
-        public async ValueTask<IActionResult> Put(int id, [FromBody] Site value)
+        public async ValueTask<IActionResult> Put(int id, [FromBody] Models.Participant value)
         {
-            var site = await this.participantApiContext.Sites.FirstOrDefaultAsync(s => s.Id == id);
-            if (site != null)
+            var participant = await this.participantApiContext.Participants.FirstOrDefaultAsync(s => s.Id == id);
+            if (participant != null)
             {
-                site.Name = value.Name;
-                site.Enabled = value.Enabled;
-                site.Visible = value.Visible;
+                participant.Name = value.Name;
+                participant.Enabled = value.Enabled;
+                participant.Visible = value.Visible;
                 await this.participantApiContext.SaveChangesAsync();
                 return Ok();
             }
@@ -85,7 +85,7 @@ namespace UID.Participant.Api.Controllers
             }
         }
 
-        // DELETE api/Sites/5
+        // DELETE api/Participants/5
         /*[HttpDelete("{id}")]
         public void Delete(int id)
         {

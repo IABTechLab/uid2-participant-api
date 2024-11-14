@@ -1,36 +1,48 @@
 using AutoFixture;
 using EntityFrameworkCore.Testing.NSubstitute;
+using EntityFrameworkCore.Testing.NSubstitute.Helpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.Data.Sqlite;
+using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.Logging;
 using NSubstitute;
 using UID.Participant.Api.Controllers;
 using UID.Participant.Api.Models;
 
-namespace UID2.Participant.Api.Test
+namespace UID.Participant.Api.Test
 {
-    public class SiteControllerGetTests
+    public class ParticipantControllerGetTests : IDisposable
     {
         private Fixture fixture;
+        private SqliteConnection sqLiteConnection;
         private ParticipantApiContext mockedContext;
-        private ILogger<SitesController> loggerMock;
-        private SitesController sut;
+        private ILogger<ParticipantsController> loggerMock;
+        private ParticipantsController sut;
 
         // xUnit create a new instance of the class for each test
-        public SiteControllerGetTests()
+        public ParticipantControllerGetTests()
         {
             this.fixture = new Fixture();
-            this.mockedContext = Create.MockedDbContextFor<ParticipantApiContext>();
-            this.loggerMock = Substitute.For<ILogger<SitesController>>();
-            this.sut = new SitesController(loggerMock, mockedContext);
+            this.sqLiteConnection = new SqliteConnection("Filename=:memory:");
+            sqLiteConnection.Open();
+            var dbContextToMock = new ParticipantApiContext(new DbContextOptionsBuilder<ParticipantApiContext>().UseSqlite(this.sqLiteConnection).Options);
+            dbContextToMock.Database.EnsureCreated();
+            this.mockedContext = new MockedDbContextBuilder<ParticipantApiContext>().UseDbContext(dbContextToMock).MockedDbContext;
+
+            //this.mockedContext = Create.MockedDbContextFor<ParticipantApiContext>();
+            this.loggerMock = Substitute.For<ILogger<ParticipantsController>>();
+            this.sut = new ParticipantsController(loggerMock, mockedContext);
         }
 
+        
+
         [Fact]
-        public async Task GetSitesReturnsAllSites()
+        public async Task ReturnsAllParticipants()
         {
             // arrange
-            var sites = fixture.CreateMany<Site>();
-            mockedContext.Sites.AddRange(sites);
+            var participants = fixture.CreateMany<Models.Participant>();
+            mockedContext.Participants.AddRange(participants);
             mockedContext.SaveChanges();
 
             // Act
@@ -40,14 +52,14 @@ namespace UID2.Participant.Api.Test
             result.Should().NotBeNull();
             var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
             okResult.StatusCode.Should().Be(200);
-            var actualSites = okResult.Value.Should().BeOfType<List<Site>>().Subject;
-            actualSites.Should().NotBeEmpty()
-                .And.HaveCount(sites.Count());
-            actualSites.Should().BeEquivalentTo(sites);
+            var actualParticipants = okResult.Value.Should().BeOfType<List<Models.Participant>>().Subject;
+            actualParticipants.Should().NotBeEmpty()
+                .And.HaveCount(participants.Count());
+            actualParticipants.Should().BeEquivalentTo(participants);
         }
 
         [Fact]
-        public async Task GetSitesReturnsEmptyList()
+        public async Task ReturnsEmptyList()
         {
             // arrange
 
@@ -58,30 +70,54 @@ namespace UID2.Participant.Api.Test
             result.Should().NotBeNull();
             var okResult = result.Should().BeOfType<OkObjectResult>().Subject;
             okResult.StatusCode.Should().Be(200);
-            okResult.Value.Should().BeOfType<List<Site>>().Subject.Should().BeEmpty();
+            okResult.Value.Should().BeOfType<List<Models.Participant>>().Subject.Should().BeEmpty();
         }
 
         [Fact]
-        public async Task GetSiteByIdReturnsSite()
+        public async Task ByIdReturnsParticipant()
         {
             // arrange
-            var sites = this.fixture.CreateMany<Site>();
-            this.mockedContext.Sites.AddRange(sites);
+            var participants = this.fixture.CreateMany<Models.Participant>();
+            this.mockedContext.Participants.AddRange(participants);
             this.mockedContext.SaveChanges();
 
             // act
-            foreach (var site in sites)
+            foreach (var participant in participants)
             {
-                var result = await this.sut.Get(site.Id);
+                var result = await this.sut.Get(participant.Id);
 
                 // assert
                 result.Should().NotBeNull();
                 var okResult = result.Should()
                     .BeOfType<OkObjectResult>().Subject;
                 okResult.StatusCode.Should().Be(200);
-                okResult.Value
-                    .Should().BeOfType<Site>().Subject
-                    .Should().BeEquivalentTo(site);
+                var actualParticipant = okResult.Value
+                    .Should().BeOfType<Models.Participant>().Subject;
+                actualParticipant.Should().BeEquivalentTo(participant);
+                actualParticipant.ClientTypes.Should().BeEquivalentTo(participant.ClientTypes);
+                // actualParticipant
+            }
+        }
+
+        [Fact]
+        public async Task ByIdReturnsNotFound()
+        {
+            // arrange
+            var participants = this.fixture.CreateMany<Models.Participant>();
+            this.mockedContext.Participants.AddRange(participants);
+            this.mockedContext.SaveChanges();
+
+            // act
+            var result = await this.sut.Get(int.MaxValue);
+            result.Should().NotBeNull();
+            var notFound = result.Should().BeOfType<NotFoundResult>();
+        }
+
+        public void Dispose()
+        {
+            if (this.sqLiteConnection != null)
+            {
+                this.sqLiteConnection.Close();
             }
         }
     }
