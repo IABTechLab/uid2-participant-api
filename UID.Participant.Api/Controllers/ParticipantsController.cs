@@ -11,16 +11,10 @@ namespace UID.Participant.Api.Controllers
     [ApiController]
     [ApiVersion(1.0)]
     [ProducesResponseType(StatusCodes.Status401Unauthorized)]
-    public class ParticipantsController : ControllerBase
+    public class ParticipantsController(ILogger<ParticipantsController> logger, ParticipantApiContext participantApiContext) : ControllerBase
     {
-        private readonly ILogger<ParticipantsController> logger;
-        private readonly ParticipantApiContext participantApiContext;
-
-        public ParticipantsController(ILogger<ParticipantsController> logger, ParticipantApiContext participantApiContext)
-        {
-            this.logger = logger;
-            this.participantApiContext = participantApiContext;
-        }
+        private readonly ILogger<ParticipantsController> logger = logger;
+        private readonly ParticipantApiContext participantApiContext = participantApiContext;
 
         // GET: api/Participants
         [HttpGet]
@@ -30,7 +24,7 @@ namespace UID.Participant.Api.Controllers
             var participants = await this.participantApiContext.Participants
                 .AsNoTracking()
                 .ToListAsync();
-            return Ok(participants);
+            return this.Ok(participants);
         }
 
         // GET api/Participants/5
@@ -42,7 +36,7 @@ namespace UID.Participant.Api.Controllers
             var participant = await this.participantApiContext.Participants
                 .AsNoTracking()
                 .FirstOrDefaultAsync(s => s.Id == id);
-            return participant == null ? NotFound() : Ok(participant);
+            return participant == null ? this.NotFound() : this.Ok(participant);
         }
 
         // POST api/Participants
@@ -54,12 +48,12 @@ namespace UID.Participant.Api.Controllers
             try
             {
                 await this.participantApiContext.AddAsync(value);
-                return Ok();
+                return this.Ok();
             }
             catch (Exception ex)
             {
                 this.logger.LogDebug(ex, "Error adding Participant.");
-                return BadRequest();
+                return this.BadRequest();
             }
         }
 
@@ -77,11 +71,11 @@ namespace UID.Participant.Api.Controllers
                 participant.Enabled = value.Enabled;
                 participant.Visible = value.Visible;
                 await this.participantApiContext.SaveChangesAsync();
-                return Ok();
+                return this.Ok();
             }
             else
             {
-                return NotFound();
+                return this.NotFound();
             }
         }
 

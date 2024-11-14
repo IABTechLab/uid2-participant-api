@@ -56,7 +56,7 @@ public partial class ParticipantApiContext : DbContext
             entity.Navigation(e => e.ClientTypes).AutoInclude();
         });
 
-        OnModelCreatingPartial(modelBuilder);
+        this.OnModelCreatingPartial(modelBuilder);
     }
 
     partial void OnModelCreatingPartial(ModelBuilder modelBuilder);

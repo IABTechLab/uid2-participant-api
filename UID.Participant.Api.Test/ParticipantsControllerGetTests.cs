@@ -1,6 +1,4 @@
 using AutoFixture;
-using EntityFrameworkCore.Testing.NSubstitute;
-using EntityFrameworkCore.Testing.NSubstitute.Helpers;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.Data.Sqlite;
@@ -14,39 +12,38 @@ namespace UID.Participant.Api.Test
 {
     public class ParticipantControllerGetTests : IDisposable
     {
-        private Fixture fixture;
-        private SqliteConnection sqLiteConnection;
-        private ParticipantApiContext mockedContext;
-        private ILogger<ParticipantsController> loggerMock;
-        private ParticipantsController sut;
+        private readonly Fixture fixture;
+        private readonly SqliteConnection sqLiteConnection;
+        private readonly ParticipantApiContext participantContext;
+        private readonly ILogger<ParticipantsController> loggerMock;
+        private readonly ParticipantsController sut;
 
         // xUnit create a new instance of the class for each test
         public ParticipantControllerGetTests()
         {
             this.fixture = new Fixture();
-            this.sqLiteConnection = new SqliteConnection("Filename=:memory:");
-            sqLiteConnection.Open();
-            var dbContextToMock = new ParticipantApiContext(new DbContextOptionsBuilder<ParticipantApiContext>().UseSqlite(this.sqLiteConnection).Options);
-            dbContextToMock.Database.EnsureCreated();
-            this.mockedContext = new MockedDbContextBuilder<ParticipantApiContext>().UseDbContext(dbContextToMock).MockedDbContext;
+            this.sqLiteConnection = new SqliteConnection("Filename=:memory:"); 
+            this.sqLiteConnection.Open();
+            this.participantContext = new ParticipantApiContext(new DbContextOptionsBuilder<ParticipantApiContext>().UseSqlite(this.sqLiteConnection).Options);
+            this.participantContext.Database.EnsureCreated();
 
-            //this.mockedContext = Create.MockedDbContextFor<ParticipantApiContext>();
             this.loggerMock = Substitute.For<ILogger<ParticipantsController>>();
-            this.sut = new ParticipantsController(loggerMock, mockedContext);
-        }
 
-        
+            // separate the read and write contexts, so only changes that happen through .SaveChanges are returned in the queiries
+            var readContext = new ParticipantApiContext(new DbContextOptionsBuilder<ParticipantApiContext>().UseSqlite(this.sqLiteConnection).Options);
+            this.sut = new ParticipantsController(this.loggerMock, readContext);
+        }
 
         [Fact]
         public async Task ReturnsAllParticipants()
         {
             // arrange
-            var participants = fixture.CreateMany<Models.Participant>();
-            mockedContext.Participants.AddRange(participants);
-            mockedContext.SaveChanges();
+            var participants = this.fixture.CreateMany<Models.Participant>();
+            this.participantContext.Participants.AddRange(participants);
+            this.participantContext.SaveChanges();
 
             // Act
-            var result = await sut.Get();
+            var result = await this.sut.Get();
 
             // Assert
             result.Should().NotBeNull();
@@ -64,7 +61,7 @@ namespace UID.Participant.Api.Test
             // arrange
 
             // act
-            var result = await sut.Get();
+            var result = await this.sut.Get();
 
             // assert
             result.Should().NotBeNull();
@@ -78,8 +75,8 @@ namespace UID.Participant.Api.Test
         {
             // arrange
             var participants = this.fixture.CreateMany<Models.Participant>();
-            this.mockedContext.Participants.AddRange(participants);
-            this.mockedContext.SaveChanges();
+            this.participantContext.Participants.AddRange(participants);
+            this.participantContext.SaveChanges();
 
             // act
             foreach (var participant in participants)
@@ -95,7 +92,6 @@ namespace UID.Participant.Api.Test
                     .Should().BeOfType<Models.Participant>().Subject;
                 actualParticipant.Should().BeEquivalentTo(participant);
                 actualParticipant.ClientTypes.Should().BeEquivalentTo(participant.ClientTypes);
-                // actualParticipant
             }
         }
 
@@ -104,13 +100,30 @@ namespace UID.Participant.Api.Test
         {
             // arrange
             var participants = this.fixture.CreateMany<Models.Participant>();
-            this.mockedContext.Participants.AddRange(participants);
-            this.mockedContext.SaveChanges();
+            this.participantContext.Participants.AddRange(participants);
+            this.participantContext.SaveChanges();
 
             // act
             var result = await this.sut.Get(int.MaxValue);
             result.Should().NotBeNull();
-            var notFound = result.Should().BeOfType<NotFoundResult>();
+            result.Should().BeOfType<NotFoundResult>();
+        }
+
+        [Fact]
+        public async Task ByIdReturnsExpectedClientTypes()
+        {
+            var participant = this.fixture.Create<Models.Participant>();
+            this.participantContext.Participants.Add(participant);
+            this.participantContext.SaveChanges();
+
+            // add a client type that should not exist on the returned one
+            var newClientType = new ClientType { Id = 500, Name = "New Client Type" };
+            participant.ClientTypes.Add(newClientType);
+
+            var result = await this.sut.Get(participant.Id);
+            var actualParticipant = result.Should().BeOfType<OkObjectResult>().Subject.Value.Should().BeOfType<Models.Participant>().Subject;
+
+            actualParticipant.ClientTypes.Should().NotContain(newClientType);
         }
 
         public void Dispose()
@@ -118,7 +131,10 @@ namespace UID.Participant.Api.Test
             if (this.sqLiteConnection != null)
             {
                 this.sqLiteConnection.Close();
+                this.sqLiteConnection.Dispose();
             }
+
+            GC.SuppressFinalize(this);
         }
     }
 }
