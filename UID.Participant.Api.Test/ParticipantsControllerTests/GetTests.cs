@@ -5,7 +5,7 @@ using UID.Participant.Api.Models;
 
 namespace UID.Participant.Api.Test.ParticipantsControllerTests
 {
-    public class ParticipantControllerGetTests : ParticipantsControllerTestsBase
+    public class GetTests : TestsBase
     {
         // xUnit create a new instance of the class for each test
 
@@ -98,7 +98,7 @@ namespace UID.Participant.Api.Test.ParticipantsControllerTests
         {
             var participant = this.Fixture
                 .Build<Models.Participant>()
-                .With(p => p.ClientTypes, [this.KnownClientTypes.First()])
+                .With(p => p.ClientTypes, [this.KnownClientTypes[1]])
                 .Create();
             this.WriteParticipantContext.Participants.Add(participant);
             this.WriteParticipantContext.SaveChanges();

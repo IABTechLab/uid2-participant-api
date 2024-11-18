@@ -7,7 +7,7 @@ using UID.Participant.Api.Models;
 
 namespace UID.Participant.Api.Test.ParticipantsControllerTests
 {
-    public class ParticipantsControllerPostTests : ParticipantsControllerTestsBase
+    public class PostTests : TestsBase
     {
         [Theory]
         [InlineData(new int[0] )]

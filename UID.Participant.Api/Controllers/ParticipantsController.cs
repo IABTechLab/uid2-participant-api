@@ -49,13 +49,14 @@ namespace UID.Participant.Api.Controllers
         {
             try
             {
-                var validClientTypes = await this.ValidateClientTypes(value.ClientTypes);
+
+                /*var validClientTypes = await this.ValidateClientTypes(value.ClientTypes);
                 if (!validClientTypes.valid)
                 {
                     return this.BadRequest(this.ModelState);
-                }
+                }*/
 
-                value.ClientTypes = validClientTypes.clientTypes;
+                value.ClientTypes = value.ClientTypes;
                 await this.participantApiContext.AddAsync(value);
                 await this.participantApiContext.SaveChangesAsync();
                 return this.Ok(value);
@@ -75,16 +76,10 @@ namespace UID.Participant.Api.Controllers
         public async ValueTask<IActionResult> Put(int id, [FromBody] Models.Participant value)
         {
             var participant = await this.participantApiContext.Participants.FirstOrDefaultAsync(s => s.Id == id);
-            var validClientTypes = await this.ValidateClientTypes(value.ClientTypes);
 
             if (participant is null)
             {
                 return this.NotFound();
-            }
-
-            if (!validClientTypes.valid)
-            {
-                return this.BadRequest(this.ModelState);
             }
 
             if (participant != null)
@@ -92,7 +87,7 @@ namespace UID.Participant.Api.Controllers
                 participant.Name = value.Name;
                 participant.Enabled = value.Enabled;
                 participant.Visible = value.Visible;
-                participant.ClientTypes = validClientTypes.clientTypes;
+                participant.ClientTypes = value.ClientTypes;
                 await this.participantApiContext.SaveChangesAsync();
                 return this.Ok(participant);
             }
@@ -108,20 +103,5 @@ namespace UID.Participant.Api.Controllers
         {
         }*/
 
-        private async ValueTask<(bool valid, ICollection<ClientType> clientTypes)> ValidateClientTypes(ICollection<ClientType> clientTypes)
-        {
-            // get all the client types in the database that match the given ones
-            var dbClientTypes = await this.participantApiContext.ClientTypes.Where(ct => clientTypes.Contains(ct)).ToListAsync();
-
-            // remove all the valid ones
-            var invalidClientTypes = clientTypes.Except(dbClientTypes);
-            if (invalidClientTypes.Any())
-            {
-                this.ModelState.AddModelError("Invalid ClientTypes", string.Join(",", invalidClientTypes.Select(ct => ct.ToString())));
-                return (valid: false, clientTypes: new List<ClientType>(invalidClientTypes));
-            }
-
-            return (valid: true, clientTypes: dbClientTypes);
-        }
     }
 }
