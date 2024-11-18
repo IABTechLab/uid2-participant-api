@@ -15,9 +15,11 @@ public partial class ParticipantApiContext : DbContext
     {
     }
 
-    public virtual DbSet<ClientType> ClientTypes { get; set; }
+    // The = null!; is to tell the compiler that although it looks like ClientTypes is null, don't worry about it.
+    // It is set by EF Core via reflection
+    public virtual DbSet<ClientType> ClientTypes { get; set; } = null!;
 
-    public virtual DbSet<Participant> Participants { get; set; }
+    public virtual DbSet<Participant> Participants { get; set; } = null!;
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
     {

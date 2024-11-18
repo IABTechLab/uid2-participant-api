@@ -1,6 +1,8 @@
 ﻿using Asp.Versioning;
 using Microsoft.AspNetCore.Mvc;
+using Microsoft.AspNetCore.Mvc.Razor;
 using Microsoft.EntityFrameworkCore;
+using Newtonsoft.Json.Linq;
 using UID.Participant.Api.Models;
 
 // For more information on enabling Web API for empty projects, visit https://go.microsoft.com/fwlink/?LinkID=397860
@@ -47,8 +49,16 @@ namespace UID.Participant.Api.Controllers
         {
             try
             {
+                var validClientTypes = await this.ValidateClientTypes(value.ClientTypes);
+                if (!validClientTypes.valid)
+                {
+                    return this.BadRequest(this.ModelState);
+                }
+
+                value.ClientTypes = validClientTypes.clientTypes;
                 await this.participantApiContext.AddAsync(value);
-                return this.Ok();
+                await this.participantApiContext.SaveChangesAsync();
+                return this.Ok(value);
             }
             catch (Exception ex)
             {
@@ -65,13 +75,26 @@ namespace UID.Participant.Api.Controllers
         public async ValueTask<IActionResult> Put(int id, [FromBody] Models.Participant value)
         {
             var participant = await this.participantApiContext.Participants.FirstOrDefaultAsync(s => s.Id == id);
+            var validClientTypes = await this.ValidateClientTypes(value.ClientTypes);
+
+            if (participant is null)
+            {
+                return this.NotFound();
+            }
+
+            if (!validClientTypes.valid)
+            {
+                return this.BadRequest(this.ModelState);
+            }
+
             if (participant != null)
             {
                 participant.Name = value.Name;
                 participant.Enabled = value.Enabled;
                 participant.Visible = value.Visible;
+                participant.ClientTypes = validClientTypes.clientTypes;
                 await this.participantApiContext.SaveChangesAsync();
-                return this.Ok();
+                return this.Ok(participant);
             }
             else
             {
@@ -84,5 +107,21 @@ namespace UID.Participant.Api.Controllers
         public void Delete(int id)
         {
         }*/
+
+        private async ValueTask<(bool valid, ICollection<ClientType> clientTypes)> ValidateClientTypes(ICollection<ClientType> clientTypes)
+        {
+            // get all the client types in the database that match the given ones
+            var dbClientTypes = await this.participantApiContext.ClientTypes.Where(ct => clientTypes.Contains(ct)).ToListAsync();
+
+            // remove all the valid ones
+            var invalidClientTypes = clientTypes.Except(dbClientTypes);
+            if (invalidClientTypes.Any())
+            {
+                this.ModelState.AddModelError("Invalid ClientTypes", string.Join(",", invalidClientTypes.Select(ct => ct.ToString())));
+                return (valid: false, clientTypes: new List<ClientType>(invalidClientTypes));
+            }
+
+            return (valid: true, clientTypes: dbClientTypes);
+        }
     }
 }
