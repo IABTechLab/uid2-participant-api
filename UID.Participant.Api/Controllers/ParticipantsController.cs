@@ -49,14 +49,6 @@ namespace UID.Participant.Api.Controllers
         {
             try
             {
-
-                /*var validClientTypes = await this.ValidateClientTypes(value.ClientTypes);
-                if (!validClientTypes.valid)
-                {
-                    return this.BadRequest(this.ModelState);
-                }*/
-
-                value.ClientTypes = value.ClientTypes;
                 await this.participantApiContext.AddAsync(value);
                 await this.participantApiContext.SaveChangesAsync();
                 return this.Ok(value);

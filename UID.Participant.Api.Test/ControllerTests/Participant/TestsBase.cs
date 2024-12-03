@@ -1,13 +1,8 @@
 ﻿using Microsoft.Extensions.Logging;
 using NSubstitute;
-using System;
-using System.Collections.Generic;
-using System.Linq;
-using System.Text;
-using System.Threading.Tasks;
 using UID.Participant.Api.Controllers;
 
-namespace UID.Participant.Api.Test.ParticipantsControllerTests
+namespace UID.Participant.Api.Test.ControllerTests.Participant
 {
     public abstract class TestsBase : ControllerTestsBase
     {

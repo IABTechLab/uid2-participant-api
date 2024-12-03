@@ -3,7 +3,7 @@ using Microsoft.Data.Sqlite;
 using Microsoft.EntityFrameworkCore;
 using UID.Participant.Api.Models;
 
-namespace UID.Participant.Api.Test
+namespace UID.Participant.Api.Test.ControllerTests
 {
     public abstract class ControllerTestsBase : IDisposable
     {
@@ -32,7 +32,7 @@ namespace UID.Participant.Api.Test
             this.WriteParticipantContext.ClientTypes.AddRange(this.KnownClientTypes);
             this.WriteParticipantContext.SaveChanges();
 
-            // separate the read and write contexts, so only changes that happen through .SaveChanges are returned in the queiries
+            // separate the read and write contexts, so only changes that happen through .SaveChanges are returned in the queries
             this.ReadParticipantContext = new ParticipantApiContext(new DbContextOptionsBuilder<ParticipantApiContext>().UseSqlite(this.SqLiteConnection).Options);
         }
 

@@ -1,16 +1,18 @@
 ﻿using AutoFixture;
-using AutoFixture.Kernel;
 using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
-using System.Runtime.CompilerServices;
+using NSubstitute;
+using System.ComponentModel.DataAnnotations;
+using UID.Participant.Api.Controllers;
 using UID.Participant.Api.Models;
+using UID.Participant.Api.Validation;
 
-namespace UID.Participant.Api.Test.ParticipantsControllerTests
+namespace UID.Participant.Api.Test.ControllerTests.Participant
 {
     public class PostTests : TestsBase
     {
         [Theory]
-        [InlineData(new int[0] )]
+        [InlineData(new int[0])]
         [InlineData(new[] { 1 })]
         [InlineData(new[] { 1, 2 })]
         [InlineData(new[] { 1, 2, 3 })]
@@ -21,6 +23,14 @@ namespace UID.Participant.Api.Test.ParticipantsControllerTests
                 .Build<Models.Participant>()
                 .With(p => p.ClientTypes, new List<ClientType>(this.KnownClientTypes.Where(ct => clientTypeIds.Contains(ct.Id))))
                 .Create();
+
+            var serviceProviderMock = Substitute.For<IServiceProvider>();
+            serviceProviderMock.GetService(typeof(ParticipantApiContext)).Returns(this.ReadParticipantContext);
+
+            var context = new ValidationContext(participant.ClientTypes, serviceProviderMock, null);
+            var validator = new ValidateClientTypesAttribute();
+
+            validator.IsValidInternal(participant.ClientTypes, context);
 
             var result = await this.sut.Post(participant);
             result.Should().NotBeNull();
@@ -36,12 +46,19 @@ namespace UID.Participant.Api.Test.ParticipantsControllerTests
                 .With(p => p.ClientTypes, new List<ClientType>([dummyClientType]))
                 .Create();
 
+            this.sut.ModelState.AddModelError("Invalid ClientTypes", "error");
             var result = await this.sut.Post(participant);
             result.Should().NotBeNull();
             var errorResult = result.Should().BeOfType<BadRequestObjectResult>().Subject.Value.Should().BeOfType<SerializableError>().Subject;
             var keyPair = errorResult.First().Should().BeOfType<KeyValuePair<string, object>>().Subject;
             keyPair.Key.Should().Be("Invalid ClientTypes");
             keyPair.Value.Should().BeOfType<string[]>().Subject[0].Should().Be(dummyClientType.ToString());
+        }
+
+        [Fact]
+        public async Task IntegrationTest()
+        {
+
         }
     }
 }

@@ -3,7 +3,7 @@ using FluentAssertions;
 using Microsoft.AspNetCore.Mvc;
 using UID.Participant.Api.Models;
 
-namespace UID.Participant.Api.Test.ParticipantsControllerTests
+namespace UID.Participant.Api.Test.ControllerTests.Participant
 {
     public class GetTests : TestsBase
     {

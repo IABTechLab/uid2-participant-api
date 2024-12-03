@@ -17,6 +17,11 @@
     <NoWarn>1701;1702;NU1901;NU1902;NU1903</NoWarn>
   </PropertyGroup>
 
+    <ItemGroup>
+	    <AssemblyAttribute Include="System.Runtime.CompilerServices.InternalsVisibleToAttribute">
+		    <_Parameter1>UID.Participant.Api.Test</_Parameter1>
+	    </AssemblyAttribute>
+    </ItemGroup>	
 
   <ItemGroup>
     <PackageReference Include="Asp.Versioning.Mvc" Version="8.1.0" />

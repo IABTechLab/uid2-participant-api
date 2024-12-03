@@ -8,6 +8,11 @@ namespace UID.Participant.Api.Validation
     {
         public override bool RequiresValidationContext => true;
 
+        internal ValidationResult? IsValidInternal(object? value, ValidationContext validationContext)
+        {
+            return this.IsValid(value, validationContext);
+        }
+
         protected override ValidationResult? IsValid(object? value, ValidationContext validationContext)
         {
             var participantApiContext = validationContext.GetService<ParticipantApiContext>();
