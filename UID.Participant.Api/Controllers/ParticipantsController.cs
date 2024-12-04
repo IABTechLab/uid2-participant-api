@@ -88,12 +88,5 @@ namespace UID.Participant.Api.Controllers
                 return this.NotFound();
             }
         }
-
-        // DELETE api/Participants/5
-        /*[HttpDelete("{id}")]
-        public void Delete(int id)
-        {
-        }*/
-
     }
 }
