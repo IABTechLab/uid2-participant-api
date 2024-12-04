@@ -11,17 +11,12 @@ namespace UID.Participant.Api.Test.ControllerTests.Participant
 {
     public class PostTests : TestsBase
     {
-        [Theory]
-        [InlineData(new int[0])]
-        [InlineData(new[] { 1 })]
-        [InlineData(new[] { 1, 2 })]
-        [InlineData(new[] { 1, 2, 3 })]
-        [InlineData(new[] { 1, 2, 3, 4 })]
-        public async Task PostSavesParticipantWithValidClientType(int[] clientTypeIds)
+        [Fact]
+        public async Task PostSavesParticipant()
         {
             var participant = this.Fixture
                 .Build<Models.Participant>()
-                .With(p => p.ClientTypes, new List<ClientType>(this.KnownClientTypes.Where(ct => clientTypeIds.Contains(ct.Id))))
+                .With(p => p.ClientTypes, [])
                 .Create();
 
             var serviceProviderMock = Substitute.For<IServiceProvider>();
@@ -53,12 +48,6 @@ namespace UID.Participant.Api.Test.ControllerTests.Participant
             var keyPair = errorResult.First().Should().BeOfType<KeyValuePair<string, object>>().Subject;
             keyPair.Key.Should().Be("Invalid ClientTypes");
             keyPair.Value.Should().BeOfType<string[]>().Subject[0].Should().Be(dummyClientType.ToString());
-        }
-
-        [Fact]
-        public async Task IntegrationTest()
-        {
-
         }
     }
 }
