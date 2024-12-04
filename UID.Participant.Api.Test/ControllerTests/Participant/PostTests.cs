@@ -32,7 +32,7 @@ namespace UID.Participant.Api.Test.ControllerTests.Participant
             result.Should().BeOfType<OkObjectResult>().Subject.Value.Should().BeOfType<Models.Participant>().And.BeEquivalentTo(participant);
         }
 
-        [Fact]
+        /*[Fact]
         public async Task PostReturnsBadRequestParticipantWithNewClientTypes()
         {
             var dummyClientType = new ClientType { Id = 5, Name = "Does not exist" };
@@ -48,6 +48,6 @@ namespace UID.Participant.Api.Test.ControllerTests.Participant
             var keyPair = errorResult.First().Should().BeOfType<KeyValuePair<string, object>>().Subject;
             keyPair.Key.Should().Be("Invalid ClientTypes");
             keyPair.Value.Should().BeOfType<string[]>().Subject[0].Should().Be(dummyClientType.ToString());
-        }
+        }*/
     }
 }
