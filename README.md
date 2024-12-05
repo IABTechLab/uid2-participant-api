@@ -1,10 +1,18 @@
-# docker commands
+# docker compose commands
 
-Build the image:
-`docker build -t uid2-participant-api-image .`
+Build the images:
 
-Run the container:
-`docker run -d -p 6001:8080 --name uid2-participant-api-image-container uid2-participant-api-image`
+`docker compose -f .\docker-compose.yml -f .\docker-compose.override.yml build`
+
+Run the docker stack:
+
+`docker compose -f .\docker-compose.yml -f .\docker-compose.override.yml up`
 
 Go here to test:
-http://localhost:6001/swagger/index.html
+http://localhost:5050/swagger/index.html
+
+
+## Updating the EF Model
+To update the model based on changes to the database, run this command from the root of the UID.Participant.Api project (not the root of the solution):
+
+`dotnet ef dbcontext scaffold "Name=ConnectionStrings:uid2_selfserve" Microsoft.EntityFrameworkCore.SqlServer --context ParticipantApiContext --output-dir Models --force`

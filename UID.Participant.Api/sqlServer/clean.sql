@@ -1,0 +1,5 @@
+
+drop table ParticipantApi.ParticipantClientType
+drop table ParticipantApi.Participants
+drop table ParticipantApi.ClientTypes
+drop schema ParticipantApi

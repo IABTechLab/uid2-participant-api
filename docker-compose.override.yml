@@ -1,0 +1,8 @@
+services:
+  uid.participant.api:
+    environment:
+      - ASPNETCORE_ENVIRONMENT=Development
+      - ASPNETCORE_HTTP_PORTS=8080
+      - CONNECTIONSTRINGS__uid2_selfserve=Data Source=database,1433;Initial Catalog=uid2_selfserve;User ID=sa;Password=D3velopmentP0;TrustServerCertificate=true
+    ports:
+      - "5050:8080"
